@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relógio Pomodoro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+          rel="stylesheet" 
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+          crossorigin="anonymous">
+    <style>
+        body { transition: background-color 0.5s ease; }
+        .bg-work { background-color: #f8d7da; }
+        .bg-short-break { background-color: #d1e7dd; }
+        .bg-long-break { background-color: #cff4fc; }
+        .main-container { min-height: 90vh; }
+        .form-switch .form-check-input {
+            font-size: 1.25rem;
+            float: none; 
+        }
+    </style>
+</head>
+<body class="bg-work">
+    <div class="container d-flex flex-column justify-content-center align-items-center main-container">
+        <div class="card shadow-lg text-center" style="width: 25rem;">
+            <div class="card-header fs-5">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="mode-work">Trabalho</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="mode-short-break">Descanso Curto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="mode-long-break">Descanso Longo</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body p-5">
+                <h1 class="display-1 fw-bold" id="timer-display">25:00</h1>
+                <div class="mt-4">
+                    <button class="btn btn-success btn-lg mx-2" id="start-btn">
+                        <i class="bi bi-play-fill"></i> Iniciar
+                    </button>
+                    <button class="btn btn-danger btn-lg mx-2" id="pause-btn" style="display: none;">
+                        <i class="bi bi-pause-fill"></i> Pausar
+                    </button>
+                    <button class="btn btn-secondary btn-lg mx-2" id="reset-btn">
+                        <i class="bi bi-arrow-clockwise"></i> Resetar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm mt-4" style="width: 25rem;">
+            <div class="card-body">
+                <div class="mb-2">
+                    <label for="user-email" class="form-label">Seu Email (para relatórios):</label>
+                    <div class="input-group">
+                        <input type="email" class="form-control" id="user-email" placeholder="seu.email@exemplo.com">
+                        <button class="btn btn-outline-primary" type="button" id="register-btn">
+                            <i class="bi bi-person-check-fill"></i> Salvar
+                        </button>
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-dark" type="button" id="report-btn">
+                        <i class="bi bi-bar-chart-line-fill"></i> Ver Meu Relatório
+                    </button>
+                </div>
+                <div id="user-status" class="form-text text-center mt-2">
+                    Sessões não serão salvas até o email ser definido.
+                </div>
+                <hr>
+                <div class="form-check form-switch text-center">
+                    <input class="form-check-input" type="checkbox" role="switch" id="auto-switch">
+                    <label class="form-check-label ms-2" for="auto-switch">Modo Contínuo Automático</label>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-dark mt-4" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <i class="bi bi-gear-fill"></i> Configurações
+        </button>
+    </div>
+    <div class="modal fade" id="settingsModal" ... >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Configurar Tempos (em minutos)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settings-form">
+                        <div class="mb-3">
+                            <label for="work-duration" class="form-label">Trabalho (Pomodoro)</label>
+                            <input type="number" class="form-control" id="work-duration" value="25" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="short-break-duration" class="form-label">Descanso Curto</label>
+                            <input type="number" class="form-control" id="short-break-duration" value="5" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="long-break-duration" class="form-label">Descanso Longo</label>
+                            <input type="number" class="form-control" id="long-break-duration" value="15" min="1">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="save-settings-btn" data-bs-dismiss="modal">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <audio id="alarm-sound" src="https://www.soundjay.com/buttons/sounds/beep-07a.mp3" preload="auto"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timerDisplay = document.getElementById('timer-display');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const alarmSound = document.getElementById('alarm-sound');
+            const modeButtons = {
+                work: document.getElementById('mode-work'),
+                shortBreak: document.getElementById('mode-short-break'),
+                longBreak: document.getElementById('mode-long-break')
+            };
+            const settings = {
+                workInput: document.getElementById('work-duration'),
+                shortBreakInput: document.getElementById('short-break-duration'),
+                longBreakInput: document.getElementById('long-break-duration'),
+                saveBtn: document.getElementById('save-settings-btn')
+            };
+            const emailInput = document.getElementById('user-email');
+            const registerBtn = document.getElementById('register-btn');
+            const reportBtn = document.getElementById('report-btn');
+            const userStatus = document.getElementById('user-status');
+            const autoSwitch = document.getElementById('auto-switch');
+            let timerInterval = null; 
+            let timeLeftInSeconds = 25 * 60;
+            let currentMode = 'work';
+            let durations = { work: 25, shortBreak: 5, longBreak: 15 };
+            let currentUserEmail = null;
+            let isAutoMode = false; 
+            let workSessionsCompleted = 0; 
+            const sessionsForLongBreak = 4; 
+            async function registerUser() {  
+                const email = emailInput.value.trim();
+                if (!email) {
+                    alert('Por favor, insira um email válido.');
+                    return;
+                }
+                try {
+                    const response = await fetch('/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        currentUserEmail = email;
+                        userStatus.textContent = `Usuário definido: ${currentUserEmail}`;
+                        userStatus.classList.add('text-success');
+                        emailInput.disabled = true; 
+                        registerBtn.disabled = true; 
+                        alert(data.message);
+                    } else {
+                        alert(`Erro: ${data.error}`);
+                    }
+                } catch (error) {
+                    console.error('Erro ao registrar:', error);
+                    alert('Falha na comunicação com o servidor.');
+                }
+            }
+            async function logSession() {  
+                if (!currentUserEmail) {
+                    console.log('Nenhum usuário definido. Sessão não registrada.');
+                    return;
+                }
+                try {
+                    const response = await fetch('/log_session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: currentUserEmail,
+                            type: currentMode,
+                            duration: durations[currentMode]
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        console.log('Sessão registrada com sucesso!');
+                    } else {
+                        console.error('Erro ao registrar sessão:', data.error);
+                    }
+                } catch (error) {
+                    console.error('Erro ao salvar sessão:', error);
+                }
+            }
+            function viewReport() {  
+                if (currentUserEmail) {
+                    window.open(`/report/${currentUserEmail}`, '_blank');
+                } else {
+                    alert('Por favor, salve seu email primeiro para ver o relatório.');
+                }
+            }
+            function updateDisplay() { 
+                const minutes = Math.floor(timeLeftInSeconds / 60);
+                const seconds = timeLeftInSeconds % 60;
+                const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timerDisplay.textContent = formattedTime;
+                document.title = `${formattedTime} - Pomodoro`;
+            }
+            function startTimer() {
+                if (timerInterval) return; 
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+                timerInterval = setInterval(() => {
+                    timeLeftInSeconds--;
+                    updateDisplay();
+                    if (timeLeftInSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        alarmSound.play();
+                        logSession(); 
+                        let nextMode = 'work'; 
+                        if (currentMode === 'work') {
+                            workSessionsCompleted++; 
+                            if (workSessionsCompleted >= sessionsForLongBreak) {
+                                nextMode = 'longBreak';
+                                workSessionsCompleted = 0; 
+                            } else {
+                                nextMode = 'shortBreak'; 
+                            }
+                        }
+                        switchMode(nextMode);
+                        if (isAutoMode) {
+                            startTimer();
+                        }
+                    }
+                }, 1000);
+            }
+            function pauseTimer() { 
+                clearInterval(timerInterval);
+                timerInterval = null;
+                startBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+            }
+            function resetTimer() { 
+                pauseTimer(); 
+                timeLeftInSeconds = durations[currentMode] * 60; 
+                updateDisplay(); 
+            }
+            function switchMode(mode) {
+                currentMode = mode;
+                document.body.classList.remove('bg-work', 'bg-short-break', 'bg-long-break');
+                Object.values(modeButtons).forEach(btn => btn.classList.remove('active'));
+                if (mode === 'work') {
+                    modeButtons.work.classList.add('active');
+                    document.body.classList.add('bg-work');
+                } else if (mode === 'shortBreak') {
+                    modeButtons.shortBreak.classList.add('active');
+                    document.body.classList.add('bg-short-break');
+                } else {
+                    modeButtons.longBreak.classList.add('active');
+                    document.body.classList.add('bg-long-break');
+                    workSessionsCompleted = 0;
+                }
+                resetTimer(); 
+            }
+            function saveSettings() { 
+                durations.work = parseInt(settings.workInput.value, 10);
+                durations.shortBreak = parseInt(settings.shortBreakInput.value, 10);
+                durations.longBreak = parseInt(settings.longBreakInput.value, 10);
+                resetTimer();
+            }
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            modeButtons.work.addEventListener('click', (e) => { e.preventDefault(); switchMode('work'); });
+            modeButtons.shortBreak.addEventListener('click', (e) => { e.preventDefault(); switchMode('shortBreak'); });
+            modeButtons.longBreak.addEventListener('click', (e) => { e.preventDefault(); switchMode('longBreak'); });
+            settings.saveBtn.addEventListener('click', saveSettings);
+            registerBtn.addEventListener('click', registerUser);
+            reportBtn.addEventListener('click', viewReport);
+            emailInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') { registerUser(); }
+            });
+            autoSwitch.addEventListener('change', () => {
+                isAutoMode = autoSwitch.checked;
+            });
+            updateDisplay(); 
+        });
+    </script>
+</body>
+</html>
