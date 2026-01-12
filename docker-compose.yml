@@ -7,7 +7,10 @@ services:
       - "8004:8004"
     volumes:
       - pomodoro_data:/app/data
-    restart: unless-stopped 
+
+    restart: unless-stopped
+    environment:
+      - UV_PROJECT_ENVIRONMENT=/app/.venv
 
 volumes:
   pomodoro_data: {}

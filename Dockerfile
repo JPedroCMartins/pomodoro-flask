@@ -1,14 +1,22 @@
 FROM python:3.10-slim
 
-#ARQUITETURA 32BITS
-RUN apt update && \
-    apt install -y build-essential python3-dev && \
-    rm -rf /var/lib/apt/lists/*
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml uv.lock ./
+
+RUN uv sync --frozen --no-cache
+
 COPY . .
+
 EXPOSE 8004
-#CMD ["gunicorn", "--bind", "0.0.0.0:8004", "app:app"]
-CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8004", "app:app"]
+
+CMD ["uv", "run", "gunicorn", "--workers", "3", "--bind", "0.0.0.0:8004", "main:app"]
