@@ -4,7 +4,7 @@ set -e
 
 echo "--> Iniciando script de setup..."
 
-cd /app/portfolio
+cd /app/pomodoro
 
 echo "--> Verificando pacotes do sistema..."
 apk add --no-cache python3 py3-pip git > /dev/null 2>&1
