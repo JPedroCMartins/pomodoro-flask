@@ -1,4 +1,4 @@
-
+#!/bin/sh
 
 set -e
 
@@ -20,5 +20,5 @@ else
     uv sync --no-cache
 fi
 
-echo "--> Servidor pronto. Iniciando Gunicorn na porta 8000..."
+echo "--> Servidor pronto. Iniciando Gunicorn na porta 8004..."
 exec uv run gunicorn --workers 2 --bind 0.0.0.0:8004 main:app
