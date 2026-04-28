@@ -11,12 +11,8 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     
-    # Configurações de Caminho
-    base_dir = os.path.abspath(os.path.dirname(__file__))
-    data_dir = os.path.join(base_dir, 'data')
-    os.makedirs(data_dir, exist_ok=True) 
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(data_dir, 'pomodoro.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pomodoro.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # 2. Inicialize as extensões com o app criado
