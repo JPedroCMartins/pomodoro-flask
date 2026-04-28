@@ -21,4 +21,4 @@ else
 fi
 
 echo "--> Servidor pronto. Iniciando Gunicorn na porta 8000..."
-exec uv run gunicorn --workers 2 --bind 0.0.0.0:8000 main:app
+exec uv run gunicorn --workers 2 --bind 0.0.0.0:8004 main:app
