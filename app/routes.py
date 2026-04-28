@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, abort
-# Removido: from flask_sqlalchemy import SQLAlchemy (não é usado aqui)
+
 from datetime import datetime
-# Importação Relativa Corrigida:
+
 from .models import User, PomodoroSession
 from . import db
 
@@ -13,14 +13,14 @@ def index():
 
 @bp.route('/report/<string:email>')
 def report(email):
-    # Dica: use .first_or_404() para simplificar o código
+
     user = User.query.filter_by(email=email).first_or_404(description="Usuário não encontrado.")
     
-    # Traz as sessões para listar na tabela
+
     sessions = PomodoroSession.query.filter_by(user_id=user.id).order_by(PomodoroSession.timestamp.desc()).all()
     
-    # Otimização: A soma abaixo é feita na memória do Python. 
-    # Para produção/escala, seria ideal usar db.session.query(func.sum(...))
+
+
     stats = {
         'total_sessions': len(sessions),
         'total_work_min': sum(s.duration_minutes for s in sessions if s.session_type == 'work'),
@@ -36,7 +36,7 @@ def register_user():
     try:
         data = request.get_json()
         
-        # Validação mais robusta para garantir que data não é None
+
         if not data or 'email' not in data:
             return jsonify({'success': False, 'error': 'Email é obrigatório'}), 400
             
@@ -45,7 +45,7 @@ def register_user():
         user = User.query.filter_by(email=email).first()
         
         if user:
-            # Retornando 200 OK pois a operação foi bem sucedida (o usuário já existe)
+
             return jsonify({'success': True, 'message': 'Usuário encontrado.'}), 200
         
         new_user = User(email=email)
@@ -71,7 +71,7 @@ def log_session():
         if not all([email, session_type, duration]):
             return jsonify({'success': False, 'error': 'Dados incompletos'}), 400
         
-        # Validação de tipo para duração
+
         try:
             duration_int = int(duration)
         except ValueError:

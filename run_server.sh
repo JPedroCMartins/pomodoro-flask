@@ -1,5 +1,5 @@
-#!/bin/sh
-# Script para configurar o ambiente em um sistema prototipo, por favor, desconsiderar a existencia deste arquivo, ele é apenas para fins de teste e desenvolvimento.
+
+
 set -e
 
 echo "--> Iniciando script de setup..."
